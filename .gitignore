@@ -1,0 +1,33 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+data
+dist
+dist-ssr
+*.local
+
+# API secrets and local overrides
+api/config.json
+api/config.local.json
+
+# Uploaded avatars
+api/uploads/avatars/*
+!api/uploads/avatars/.gitkeep
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?

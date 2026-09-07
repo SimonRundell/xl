@@ -1,0 +1,21 @@
+{
+  "db": {
+    "host": "127.0.0.1",
+    "port": 3306,
+    "name": "xl",
+    "user": "root",
+    "pass": ""
+  },
+  "tablePrefix": "xl_",
+  "jwt": {
+    "secret": "change-this-to-a-long-random-string",
+    "issuer": "xl",
+    "ttlSeconds": 604800
+  },
+  "uploads": {
+    "avatarDir": "uploads/avatars",
+    "maxBytes": 1048576,
+    "allowedTypes": ["image/png", "image/jpeg", "image/webp", "image/gif"]
+  },
+  "allowedOrigins": []
+}

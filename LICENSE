@@ -1,0 +1,50 @@
+XL - Spreadsheet Trainer
+Copyright (c) 2026 Simon Rundell
+
+This work is licensed under the Creative Commons
+Attribution-NonCommercial-ShareAlike 4.0 International License (CC BY-NC-SA 4.0).
+
+You are free to:
+
+  Share  - copy and redistribute the material in any medium or format
+  Adapt  - remix, transform, and build upon the material
+
+The licensor cannot revoke these freedoms as long as you follow the licence
+terms.
+
+Under the following terms:
+
+  Attribution   - You must give appropriate credit, provide a link to the
+                  licence, and indicate if changes were made. You may do so in
+                  any reasonable manner, but not in any way that suggests the
+                  licensor endorses you or your use.
+
+  NonCommercial - You may not use the material for commercial purposes.
+
+  ShareAlike    - If you remix, transform, or build upon the material, you must
+                  distribute your contributions under the same licence as the
+                  original.
+
+  No additional restrictions - You may not apply legal terms or technological
+                  measures that legally restrict others from doing anything the
+                  licence permits.
+
+Full licence text: https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode
+Human readable summary: https://creativecommons.org/licenses/by-nc-sa/4.0/
+
+--------------------------------------------------------------------------------
+Third party components
+--------------------------------------------------------------------------------
+
+This project depends on the following libraries, each under its own licence:
+
+  react, react-dom            MIT
+  react-router-dom            MIT
+  axios                       MIT
+  react-datasheet-grid        MIT
+  hyperformula                GNU AGPL v3 or a commercial licence from Handsoncode
+
+HyperFormula is used here under the AGPL v3 option. If you redistribute this
+project or run it as a network service, review the AGPL v3 terms, or obtain a
+commercial HyperFormula licence. For classroom use inside a single institution
+this is not normally a concern, but it is your responsibility to check.

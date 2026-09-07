@@ -1,0 +1,12 @@
+# Make sure the Authorization header reaches PHP on all Apache/PHP setups.
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteCond %{HTTP:Authorization} .
+    RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+</IfModule>
+SetEnvIf Authorization "(.*)" HTTP_AUTHORIZATION=$1
+
+# Never hand out the config or raw SQL.
+<FilesMatch "\.(json|sql)$">
+    Require all denied
+</FilesMatch>

@@ -1,0 +1,1227 @@
+/* ==========================================================================
+   XL - Spreadsheet Trainer
+   Single stylesheet for the whole app. No inline styles in components except
+   for genuinely dynamic values (per cell colours and fonts chosen by the user).
+   ========================================================================== */
+
+:root {
+  --font-ui: "Trebuchet MS", "Segoe UI", system-ui, sans-serif;
+  --font-code: "Courier New", ui-monospace, monospace;
+
+  --c-bg: #f4f6f8;
+  --c-surface: #ffffff;
+  --c-border: #d6dce2;
+  --c-border-strong: #b6c0c9;
+  --c-text: #1f2933;
+  --c-text-soft: #5b6773;
+  --c-primary: #1f7a4d;
+  --c-primary-dark: #175f3c;
+  --c-primary-soft: #e4f3ea;
+  --c-danger: #b3261e;
+  --c-danger-soft: #fbe9e8;
+  --c-accent: #2f6fb0;
+  --c-header-bg: #eef1f4;
+  --c-selected: rgba(47, 111, 176, 0.16);
+
+  --radius: 6px;
+  --shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.18);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--c-text);
+  background: var(--c-bg);
+}
+
+a {
+  color: var(--c-accent);
+}
+
+/* ---------- generic controls ------------------------------------------------ */
+
+button {
+  font-family: inherit;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  border: 1px solid var(--c-border-strong);
+  border-radius: var(--radius);
+  background: var(--c-surface);
+  color: var(--c-text);
+  line-height: 1;
+}
+
+.btn:hover {
+  background: var(--c-header-bg);
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  background: var(--c-primary);
+  border-color: var(--c-primary-dark);
+  color: #fff;
+}
+
+.btn-primary:hover {
+  background: var(--c-primary-dark);
+}
+
+.btn-danger {
+  background: var(--c-danger);
+  border-color: var(--c-danger);
+  color: #fff;
+}
+
+.btn-danger:hover {
+  filter: brightness(0.92);
+}
+
+.btn-ghost {
+  border-color: transparent;
+  background: transparent;
+}
+
+.btn-ghost:hover {
+  background: rgba(0, 0, 0, 0.06);
+}
+
+.btn-sm {
+  padding: 4px 9px;
+  font-size: 13px;
+}
+
+.btn-block {
+  width: 100%;
+  justify-content: center;
+}
+
+.input,
+.select {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid var(--c-border-strong);
+  border-radius: var(--radius);
+  font-family: inherit;
+  font-size: 14px;
+  background: var(--c-surface);
+  color: var(--c-text);
+}
+
+.input:focus,
+.select:focus {
+  outline: 2px solid var(--c-accent);
+  outline-offset: -1px;
+}
+
+label.field {
+  display: block;
+  margin-bottom: 14px;
+}
+
+label.field > span {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+  color: var(--c-text-soft);
+}
+
+.form-error {
+  margin: 0 0 14px;
+  padding: 9px 12px;
+  border-radius: var(--radius);
+  background: var(--c-danger-soft);
+  color: var(--c-danger);
+  border: 1px solid #eecac7;
+}
+
+.form-note {
+  margin: 0 0 14px;
+  padding: 9px 12px;
+  border-radius: var(--radius);
+  background: var(--c-primary-soft);
+  color: var(--c-primary-dark);
+  border: 1px solid #c7e5d3;
+}
+
+.muted {
+  color: var(--c-text-soft);
+}
+
+.code {
+  font-family: var(--font-code);
+  background: var(--c-header-bg);
+  padding: 1px 5px;
+  border-radius: 4px;
+}
+
+/* ---------- auth screens -------------------------------------------------- */
+
+.auth-wrap {
+  min-height: 100%;
+  display: grid;
+  place-items: center;
+  padding: 40px 16px;
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 380px;
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 28px;
+}
+
+.auth-card h1 {
+  margin: 0 0 4px;
+  font-size: 22px;
+}
+
+.auth-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.auth-title .brand-logo {
+  width: 30px;
+  height: 30px;
+}
+
+.auth-card .sub {
+  margin: 0 0 20px;
+  color: var(--c-text-soft);
+}
+
+.auth-switch {
+  margin-top: 16px;
+  text-align: center;
+}
+
+/* ---------- app shell --------------------------------------------------- */
+
+.shell {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 8px 14px;
+  background: var(--c-surface);
+  border-bottom: 1px solid var(--c-border);
+  flex-shrink: 0;
+}
+
+.topbar .brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: bold;
+  font-size: 17px;
+  color: var(--c-primary);
+  text-decoration: none;
+  letter-spacing: 0.5px;
+}
+
+.brand-logo {
+  width: 26px;
+  height: 26px;
+  object-fit: contain;
+  display: block;
+}
+
+.topbar .spacer,
+.spacer {
+  flex: 1;
+}
+
+.editor-bar .form-error,
+.bar-error {
+  margin: 8px 14px 0;
+}
+
+.topbar nav {
+  display: flex;
+  gap: 4px;
+}
+
+.topbar nav a {
+  padding: 6px 10px;
+  border-radius: var(--radius);
+  text-decoration: none;
+  color: var(--c-text-soft);
+}
+
+.topbar nav a.active {
+  background: var(--c-primary-soft);
+  color: var(--c-primary-dark);
+}
+
+.usermenu {
+  position: relative;
+}
+
+.avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1px solid var(--c-border-strong);
+  background: var(--c-header-bg);
+  display: grid;
+  place-items: center;
+  font-weight: bold;
+  color: var(--c-text-soft);
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.usermenu .avatar {
+  padding: 0;
+}
+
+.avatar-lg {
+  width: 72px;
+  height: 72px;
+  font-size: 22px;
+}
+
+.usermenu .dropdown {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 6px);
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-lg);
+  min-width: 200px;
+  padding: 6px;
+  z-index: 40;
+}
+
+.usermenu .dropdown .who {
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--c-border);
+  margin-bottom: 6px;
+}
+
+.usermenu .dropdown button,
+.usermenu .dropdown a {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 8px 10px;
+  border: none;
+  background: none;
+  border-radius: 4px;
+  color: var(--c-text);
+  text-decoration: none;
+}
+
+.usermenu .dropdown button:hover,
+.usermenu .dropdown a:hover {
+  background: var(--c-header-bg);
+}
+
+.shell-body {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ---------- page container --------------------------------------------- */
+
+.page {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 28px 20px 60px;
+  width: 100%;
+}
+
+.page h1 {
+  margin: 0 0 18px;
+  font-size: 24px;
+}
+
+.panel {
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 20px;
+  margin-bottom: 22px;
+}
+
+.panel h2 {
+  margin: 0 0 14px;
+  font-size: 17px;
+}
+
+/* ---------- workbook list --------------------------------------------- */
+
+.wb-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 14px;
+}
+
+.wb-card {
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.wb-card h3 {
+  margin: 0;
+  font-size: 16px;
+}
+
+.wb-card .meta {
+  font-size: 12px;
+  color: var(--c-text-soft);
+}
+
+.wb-card .actions {
+  margin-top: auto;
+  display: flex;
+  gap: 6px;
+}
+
+.wb-card.new {
+  align-items: center;
+  justify-content: center;
+  border-style: dashed;
+  color: var(--c-text-soft);
+  cursor: pointer;
+  min-height: 120px;
+  font: inherit;
+  width: 100%;
+}
+
+.wb-card.new:hover {
+  border-color: var(--c-primary);
+  color: var(--c-primary);
+}
+
+/* ---------- tables ---------------------------------------------------- */
+
+table.data {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+table.data th,
+table.data td {
+  text-align: left;
+  padding: 9px 10px;
+  border-bottom: 1px solid var(--c-border);
+}
+
+table.data th {
+  color: var(--c-text-soft);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+table.data tbody tr:hover {
+  background: var(--c-header-bg);
+}
+
+.pill {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.pill.admin {
+  background: var(--c-primary-soft);
+  color: var(--c-primary-dark);
+}
+
+.pill.off {
+  background: var(--c-danger-soft);
+  color: var(--c-danger);
+}
+
+/* ---------- workbook editor ----------------------------------------- */
+
+.editor {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
+.editor-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 14px;
+  background: var(--c-surface);
+  border-bottom: 1px solid var(--c-border);
+  flex-wrap: wrap;
+}
+
+.editor-bar .wb-name {
+  font-weight: bold;
+  font-size: 15px;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  padding: 4px 6px;
+  background: transparent;
+  min-width: 120px;
+}
+
+.editor-bar .wb-name:hover,
+.editor-bar .wb-name:focus {
+  border-color: var(--c-border-strong);
+  outline: none;
+}
+
+.editor-bar .save-state {
+  font-size: 12px;
+  color: var(--c-text-soft);
+}
+
+.editor-bar .save-state.dirty {
+  color: var(--c-danger);
+}
+
+/* format toolbar */
+
+.fmt-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  background: var(--c-surface);
+  border-bottom: 1px solid var(--c-border);
+  flex-wrap: wrap;
+}
+
+.fmt-toolbar .group {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding-right: 8px;
+  border-right: 1px solid var(--c-border);
+}
+
+.fmt-toolbar .group:last-child {
+  border-right: none;
+}
+
+.fmt-btn {
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--c-border-strong);
+  border-radius: 4px;
+  background: var(--c-surface);
+  font-size: 14px;
+}
+
+.fmt-btn.on {
+  background: var(--c-primary-soft);
+  border-color: var(--c-primary);
+  color: var(--c-primary-dark);
+}
+
+.fmt-btn.wide {
+  width: auto;
+  padding: 0 10px;
+  font-size: 13px;
+}
+
+.fmt-btn.b {
+  font-weight: bold;
+}
+
+.fmt-btn.i {
+  font-style: italic;
+}
+
+.fmt-btn.u {
+  text-decoration: underline;
+}
+
+.fmt-toolbar select,
+.fmt-toolbar input[type='number'] {
+  height: 30px;
+  border: 1px solid var(--c-border-strong);
+  border-radius: 4px;
+  font-family: inherit;
+  font-size: 13px;
+  padding: 0 6px;
+  background: var(--c-surface);
+  color: var(--c-text);
+}
+
+.fmt-toolbar input[type='number'] {
+  width: 56px;
+}
+
+/* custom dropdown (used by the format toolbar pickers) */
+
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdown-button {
+  height: 30px;
+  min-width: 64px;
+  max-width: 200px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid var(--c-border-strong);
+  border-radius: 4px;
+  background: var(--c-surface);
+  color: var(--c-text);
+  font-family: inherit;
+  font-size: 13px;
+  padding: 0 8px;
+  cursor: pointer;
+}
+
+.dropdown-button:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.dropdown.open .dropdown-button {
+  border-color: var(--c-primary);
+}
+
+.dropdown-value {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: left;
+}
+
+.dropdown-caret {
+  font-size: 10px;
+  color: var(--c-text-soft);
+}
+
+.dropdown-menu {
+  position: absolute;
+  z-index: 60;
+  top: calc(100% + 2px);
+  left: 0;
+  margin: 0;
+  padding: 4px;
+  list-style: none;
+  min-width: 100%;
+  max-height: 280px;
+  overflow-y: auto;
+  background: var(--c-surface);
+  border: 1px solid var(--c-border-strong);
+  border-radius: 6px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+}
+
+.dropdown-option {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 5px 8px;
+  border-radius: 4px;
+  font-size: 13px;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.dropdown-option.active {
+  background: var(--c-primary-soft);
+}
+
+.dropdown-option.selected {
+  font-weight: 600;
+}
+
+.dropdown-option-hint {
+  font-size: 11px;
+  color: var(--c-text-soft);
+}
+
+.font-select .dropdown-button,
+.font-select {
+  min-width: 150px;
+}
+
+.font-menu .dropdown-option {
+  font-size: 15px;
+}
+
+.color-field {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--c-text-soft);
+}
+
+.color-field input[type='color'] {
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: 1px solid var(--c-border-strong);
+  border-radius: 4px;
+  background: none;
+}
+
+.scope-select {
+  font-size: 13px;
+}
+
+/* formula bar */
+
+.formula-bar {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  border-bottom: 1px solid var(--c-border);
+  background: var(--c-surface);
+}
+
+.formula-bar .addr {
+  width: 84px;
+  display: grid;
+  place-items: center;
+  font-family: var(--font-code);
+  font-weight: bold;
+  border-right: 1px solid var(--c-border);
+  background: var(--c-header-bg);
+}
+
+.formula-bar .fx {
+  width: 34px;
+  display: grid;
+  place-items: center;
+  font-style: italic;
+  color: var(--c-text-soft);
+  border-right: 1px solid var(--c-border);
+}
+
+.formula-bar input {
+  flex: 1;
+  border: none;
+  padding: 9px 12px;
+  font-family: var(--font-code);
+  font-size: 13px;
+  background: var(--c-surface);
+  color: var(--c-text);
+}
+
+.formula-bar input:focus {
+  outline: none;
+  background: #fffef3;
+}
+
+/* grid area */
+
+.grid-area {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  padding: 10px 14px;
+  position: relative;
+}
+
+.xl-resize-guide {
+  position: absolute;
+  z-index: 20;
+  background: var(--c-accent);
+  pointer-events: none;
+}
+
+/* Merge overlay cell */
+.xl-cell--anchor {
+  overflow: visible;
+}
+
+.xl-merge {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 6;
+  padding: 0 6px;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  white-space: nowrap;
+  background: var(--c-surface);
+  box-sizing: border-box;
+  border-right: 1px solid var(--c-border);
+  border-bottom: 1px solid var(--c-border);
+}
+
+.xl-merge--active {
+  outline: 2px solid var(--dsg-selection-border-color, #4580e6);
+  outline-offset: -2px;
+}
+
+.xl-cell.xl-merged-hidden {
+  visibility: hidden;
+}
+
+/* Freeze panes: scroll synced overlay strips */
+.xl-frozen-layer {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.xl-frozen-strip,
+.xl-frozen-corner {
+  position: absolute;
+  background: var(--c-surface);
+  pointer-events: auto;
+  overflow: hidden;
+}
+
+.xl-frozen-row {
+  box-shadow: 0 3px 5px rgba(0, 0, 0, 0.14);
+  z-index: 16;
+}
+
+.xl-frozen-col {
+  box-shadow: 3px 0 5px rgba(0, 0, 0, 0.14);
+  z-index: 16;
+}
+
+.xl-frozen-corner {
+  display: flex;
+  z-index: 17;
+  box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.14);
+}
+
+.xl-frozen-row .xl-frozen-scroll {
+  display: flex;
+  height: 100%;
+  will-change: transform;
+}
+
+.xl-frozen-col .xl-frozen-scroll {
+  will-change: transform;
+}
+
+.xl-frozen-rownum {
+  display: flex;
+  align-items: stretch;
+}
+
+.xl-frozen-gutter {
+  width: 44px;
+  flex: none;
+  display: grid;
+  place-items: center;
+  font-size: 12px;
+  color: var(--c-text-soft);
+  background: var(--c-header-bg);
+  border-right: 1px solid var(--c-border);
+  border-bottom: 1px solid var(--c-border);
+}
+
+.xl-frozen-cell {
+  display: flex;
+  align-items: center;
+  padding: 0 6px;
+  overflow: hidden;
+  white-space: nowrap;
+  border-right: 1px solid var(--c-border);
+  border-bottom: 1px solid var(--c-border);
+  font-variant-numeric: tabular-nums;
+  cursor: cell;
+  box-sizing: border-box;
+}
+
+.xl-cell {
+  width: 100%;
+  height: 100%;
+  padding: 0 6px;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.xl-cell.num {
+  justify-content: flex-end;
+}
+
+/* Cells being pointed at while building a formula reference. The gradient
+   composites over any per cell background colour without an !important. */
+.xl-ref-hint {
+  box-shadow: inset 0 0 0 2px var(--c-accent);
+  background-image: linear-gradient(var(--c-selected), var(--c-selected));
+}
+
+.xl-cell-input {
+  width: 100%;
+  height: 100%;
+  border: none;
+  padding: 0 6px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--c-text);
+  background: transparent;
+}
+
+.xl-cell-input:read-only {
+  cursor: default;
+}
+
+.xl-cell-input:not(:read-only) {
+  font-family: var(--font-code);
+  background: #fffef3;
+}
+
+.xl-cell-input:focus {
+  outline: none;
+}
+
+/* sheet tabs */
+
+.sheet-tabs {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 4px 10px;
+  background: var(--c-header-bg);
+  border-top: 1px solid var(--c-border);
+  flex-shrink: 0;
+  overflow-x: auto;
+}
+
+.sheet-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border: 1px solid var(--c-border);
+  border-bottom: none;
+  border-radius: 6px 6px 0 0;
+  background: var(--c-surface);
+  color: var(--c-text-soft);
+  white-space: nowrap;
+}
+
+.sheet-tab.active {
+  color: var(--c-text);
+  font-weight: bold;
+  border-color: var(--c-primary);
+  border-bottom: 2px solid var(--c-surface);
+}
+
+.sheet-tab .x {
+  border: none;
+  background: none;
+  color: inherit;
+  padding: 0 2px;
+  font-size: 14px;
+  line-height: 1;
+}
+
+.sheet-tab .x:hover {
+  color: var(--c-danger);
+}
+
+.sheet-add {
+  border: 1px dashed var(--c-border-strong);
+  background: none;
+  border-radius: 6px;
+  padding: 6px 10px;
+  color: var(--c-text-soft);
+}
+
+/* ---------- help drawer --------------------------------------------- */
+
+.drawer-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.28);
+  z-index: 50;
+}
+
+.drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  height: 100%;
+  width: min(420px, 92vw);
+  background: var(--c-surface);
+  border-left: 1px solid var(--c-border);
+  box-shadow: var(--shadow-lg);
+  z-index: 51;
+  display: flex;
+  flex-direction: column;
+  transform: translateX(100%);
+  transition: transform 0.22s ease;
+}
+
+.drawer.open {
+  transform: translateX(0);
+}
+
+.drawer header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--c-border);
+}
+
+.drawer header h2 {
+  margin: 0;
+  font-size: 16px;
+}
+
+.drawer .drawer-content {
+  padding: 16px;
+  overflow-y: auto;
+  line-height: 1.5;
+}
+
+.drawer .drawer-content h3 {
+  margin: 18px 0 6px;
+  font-size: 14px;
+}
+
+.drawer .drawer-content h3:first-child {
+  margin-top: 0;
+}
+
+.drawer .drawer-content code {
+  font-family: var(--font-code);
+  background: var(--c-header-bg);
+  padding: 1px 4px;
+  border-radius: 3px;
+}
+
+.help-fab {
+  position: fixed;
+  right: 18px;
+  bottom: 74px;
+  z-index: 30;
+  border-radius: 999px;
+  padding: 12px 18px;
+  background: var(--c-primary);
+  color: #fff;
+  border: none;
+  box-shadow: var(--shadow-lg);
+  font-weight: bold;
+}
+
+/* ---------- modal --------------------------------------------------- */
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  display: grid;
+  place-items: center;
+  z-index: 60;
+  padding: 16px;
+}
+
+.modal {
+  background: var(--c-surface);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-lg);
+  width: 100%;
+  max-width: 420px;
+  padding: 22px;
+}
+
+.modal h2 {
+  margin: 0 0 12px;
+  font-size: 18px;
+}
+
+.modal .modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 18px;
+}
+
+/* ---------- misc --------------------------------------------------- */
+
+.center-fill {
+  flex: 1;
+  display: grid;
+  place-items: center;
+  color: var(--c-text-soft);
+}
+
+.full-center {
+  height: 100%;
+  display: grid;
+  place-items: center;
+  color: var(--c-text-soft);
+}
+
+.spinner {
+  width: 26px;
+  height: 26px;
+  border: 3px solid var(--c-border);
+  border-top-color: var(--c-primary);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.row-actions {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.inline-form {
+  display: flex;
+  gap: 8px;
+  align-items: flex-end;
+  flex-wrap: wrap;
+}
+
+.inline-form label.field {
+  margin-bottom: 0;
+}
+
+/* datasheet grid tuning */
+
+.dsg-container {
+  height: 100%;
+  border: 1px solid var(--c-border-strong);
+  border-radius: var(--radius);
+}
+
+.dsg-cell {
+  font-family: var(--font-ui);
+}
+
+/* ---------- CM floating branding banner ---------------------------- */
+
+.cm-float-ad {
+  position: fixed;
+  right: 14px;
+  bottom: 14px;
+  z-index: 25;
+  background: var(--cm-bg, #f8fafc);
+  color: var(--cm-color, #334155);
+  border: 1px solid var(--c-border);
+  border-radius: 999px;
+  box-shadow: var(--shadow);
+  padding: 6px 10px;
+  max-width: 108px;
+  overflow: hidden;
+  font-size: 11px;
+  line-height: 1.4;
+  transition: max-width 0.35s ease, border-radius 0.35s ease;
+}
+
+.cm-float-ad--hovered {
+  max-width: min(530px, calc(100vw - 28px));
+  border-radius: 12px;
+}
+
+.cm-float-ad__content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+.cm-float-ad--hovered .cm-float-ad__content {
+  align-items: flex-start;
+  white-space: normal;
+}
+
+.cm-float-ad__content--column {
+  flex-direction: column;
+  align-items: flex-start;
+  white-space: normal;
+}
+
+.cm-float-ad__logo {
+  display: block;
+  flex-shrink: 0;
+}
+
+.cm-float-ad__link {
+  color: inherit;
+  font-weight: bold;
+}
+
+.cm-float-ad__mobile-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: 4px;
+}
+
+.cm-float-ad--mobile {
+  max-width: 158px;
+}
+
+.cm-float-ad--mobile-expanded {
+  max-width: calc(100vw - 24px);
+  border-radius: 12px;
+  white-space: normal;
+}
