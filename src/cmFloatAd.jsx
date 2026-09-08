@@ -4,6 +4,14 @@
  * Floating branding banner – hover to expand full contact details.
  * Modified for Exeter College by Simon Rundell, Dept of ITDD.
  *
+ * SELF CONTAINED COMPONENT - DO NOT SPLIT UP.
+ * This file is dropped as-is into other projects, so it must not depend on
+ * this project's stylesheet (src/styles/app.css) or any other external CSS.
+ * All of its styling lives in the CM_FLOAT_AD_CSS string below and is
+ * injected via a <style> tag when the component renders. If you add or
+ * change styling for this component, edit CM_FLOAT_AD_CSS here - do not
+ * move any of it into app.css or another shared stylesheet.
+ *
  * @param {Object} props
  * @param {string} [props.color='#334155']   - Text / icon colour.
  * @param {string} [props.bgColor='#f8fafc'] - Banner background colour.
@@ -12,6 +20,77 @@
  */
 
 import { useState, useEffect } from 'react';
+
+const CM_FLOAT_AD_CSS = `
+.cm-float-ad {
+  position: fixed;
+  right: 14px;
+  bottom: 14px;
+  z-index: 25;
+  background: var(--cm-bg, #f8fafc);
+  color: var(--cm-color, #334155);
+  border: 1px solid #d6dce2;
+  border-radius: 999px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.08);
+  padding: 6px 10px;
+  max-width: 108px;
+  overflow: hidden;
+  font-size: 11px;
+  line-height: 1.4;
+  /* transition: max-width 0.35s ease, border-radius 0.35s ease;*/
+  transition: max-width 2s ease, border-radius 2s ease;
+}
+
+.cm-float-ad--hovered {
+  max-width: min(530px, calc(100vw - 28px));
+  border-radius: 12px;
+}
+
+.cm-float-ad__content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+.cm-float-ad--hovered .cm-float-ad__content {
+  align-items: flex-start;
+  white-space: normal;
+}
+
+.cm-float-ad__content--column {
+  flex-direction: column;
+  align-items: flex-start;
+  white-space: normal;
+}
+
+.cm-float-ad__logo {
+  display: block;
+  flex-shrink: 0;
+}
+
+.cm-float-ad__link {
+  color: inherit;
+  font-weight: bold;
+}
+
+.cm-float-ad__mobile-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: 4px;
+}
+
+.cm-float-ad--mobile {
+  max-width: 158px;
+}
+
+.cm-float-ad--mobile-expanded {
+  max-width: calc(100vw - 24px);
+  border-radius: 12px;
+  white-space: normal;
+}
+`;
 
 const CM_LOGO =
   'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIkAAAA4CAYAAADJstsZAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyhpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuNi1jMTM4IDc5LjE1OTgyNCwgMjAxNi8wOS8xNC0wMTowOTowMSAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENDIDIwMTcgKE1hY2ludG9zaCkiIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6MTg5NDU4QjA4OUVDMTFFODgxNUFCOEJCRUJBRDg1NUQiIHhtcE1NOkRvY3VtZW50SUQ9InhtcC5kaWQ6MTg5NDU4QjE4OUVDMTFFODgxNUFCOEJCRUJBRDg1NUQiPiA8eG1wTU06RGVyaXZlZEZyb20gc3RSZWY6aW5zdGFuY2VJRD0ieG1wLmlpZDoxODk0NThBRTg5RUMxMUU4ODE1QUI4QkJFQkFEODU1RCIgc3RSZWY6ZG9jdW1lbnRJRD0ieG1wLmRpZDoxODk0NThBRjg5RUMxMUU4ODE1QUI4QkJFQkFEODU1RCIvPiA8L3JkZjpEZXNjcmlwdGlvbj4gPC9yZGY6UkRGPiA8L3g6eG1wbWV0YT4gPD94cGFja2V0IGVuZD0iciI/PpCx7RkAAAwTSURBVHja7F0LdFXFFZ18yEc+CuFvwlcIv6oUWimlNAIFBaVSFJYisqwVWEBbQIFqbSmylm21QG0RxTZdKpRisdqF5aOgoEYEAgYUCOEjP/mIkAYCBAjwuk/vvmaY3nvz3iNpEjJnrb1u3r1z587MPXPOPmfmvcSEQiFlpXSJmbelSrc/NLxTtP0eEGtfv5UABUnHYZJVEit+CpKAw9NAXaskVvxkNNAf2GWVxIqXFemNwzQgHthulcSKqSDCcJ8DruOpnVZJrOgK0gyH54F07bR1N1a+UpDGOMwFeminvwD2WyWx4ipIJnCbcWk7cMIqiVWQNjj8jZGMKTnAaask1VtBbsHhVSDDp8jHoeGdLlglqb4KcjcOC4HOPkUKgf+uRcTb4ap2yiHv/AlgAlAnoOgm4JBVkurJP34N3AXElVI8GzhqlaT6SCIURBTjKaBVGOUvAWvBR0JWSaqHiFJMBMZGcE8e8Kn7wSrJ1SvCN34ATAHaRXjveuAzqyRXt/Sh5bgrinuLgSy4mvNWSa5OuVk5S/xiQRpEWYdYkPf0E1ZJrh7eMQ4YDDS7wrrWAbusklwlES3QAhgF3AeklRKtyIuvCVwfUE4SaEvdqMYqSdWVJKA18ABwP9A0oOxJIBeYD7wG/KMUJRFX85Z50ipJ1ZEU4CZgCDBUlWwKMkUI5z7gA2AR8DYtSVoYUc4SWJECqyRVT+TFfptktH9Aub3Ax8AKYBkVRZdvALUD7v8SeMXrglWSyim1qRj9GM76fWnmc+Wkz8VqfMi//b5I9a1S3vfbsCJ5Vkkqv3xdUwwJZ+t5lDlIhRDFWEvOcToMktuNR7/cyHN+N1slqXjpCNwO9AXaA6keZWSGZwErlbMR6BAjkXClA3BDwPXltEJWSSpJ2FpDORuNv6ec7YJdgLrGLD8OfEJrsRrYykjlbJTP7cln+Mls2VxklaTiJJkc42vAdzXFiNVM/b+B3cpZM/mAR+EbFwI4RiTyHSDRL6IBPgq62SpJ2YtYioZ0G12Vs/tclKOJlruQSGQ/rYVEJBvJLS6WQ3takOv4hcsvwIoUWiUpX0ngi2hJayHbAWXvaGteP0SFeFc5y++5dB+flZGVKE1uVf6p+jeVsU5jlaRsOIVkLNsQbUk25SWk0BJIfmKNcr6ikEursY8u5f8tsvusF12eKSeAP5VmRaySBGnDvC3JdBnNeUylgl' +
@@ -37,6 +116,7 @@ export default function CMFloatAd({ color = '#334155', bgColor = '#f8fafc' }) {
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
+      <style>{CM_FLOAT_AD_CSS}</style>
       <div className={['cm-float-ad__content', isMobile && isHovered && 'cm-float-ad__content--column'].filter(Boolean).join(' ')}>
         <img alt="cm-logo" src={CM_LOGO} height="40" width="85" className="cm-float-ad__logo" />
         {!isMobile && (

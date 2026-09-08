@@ -467,6 +467,8 @@ export default function Grid({
   onSelection,
   onColWidth,
   onRowHeight,
+  onDeleteRow,
+  onDeleteColumn,
 }) {
   const sheet = doc.sheets[sheetIndex];
   const settings = doc.settings;
@@ -760,6 +762,90 @@ export default function Grid({
     };
   }, [boxRef, onColWidth, onRowHeight]);
 
+  // -- right click context menu on a row / column header -----------------
+  const [ctxMenu, setCtxMenu] = useState(null);
+
+  useEffect(() => {
+    const gridEl = boxRef.current;
+    if (!gridEl) {
+      return undefined;
+    }
+
+    const colHeaderAt = (x, y) => {
+      const heads = gridEl.querySelectorAll('.dsg-cell-header');
+      for (let i = 0; i < heads.length; i += 1) {
+        const label = heads[i].textContent.trim();
+        if (!/^[A-Z]+$/.test(label)) {
+          continue;
+        }
+        const r = heads[i].getBoundingClientRect();
+        if (x >= r.left && x <= r.right && y >= r.top && y <= r.bottom) {
+          return lettersToCol(label);
+        }
+      }
+      return null;
+    };
+
+    const rowGutterAt = (x, y) => {
+      const gutters = gridEl.querySelectorAll('.dsg-cell-gutter');
+      for (let i = 0; i < gutters.length; i += 1) {
+        const label = gutters[i].textContent.trim();
+        if (!/^\d+$/.test(label)) {
+          continue;
+        }
+        const r = gutters[i].getBoundingClientRect();
+        if (x >= r.left && x <= r.right && y >= r.top && y <= r.bottom) {
+          return Number(label) - 1;
+        }
+      }
+      return null;
+    };
+
+    const onContextMenu = (e) => {
+      const col = colHeaderAt(e.clientX, e.clientY);
+      const row = col == null ? rowGutterAt(e.clientX, e.clientY) : null;
+      if (col == null && row == null) {
+        return;
+      }
+      e.preventDefault();
+      setCtxMenu(
+        col != null
+          ? { kind: 'col', index: col, x: e.clientX, y: e.clientY }
+          : { kind: 'row', index: row, x: e.clientX, y: e.clientY },
+      );
+    };
+
+    gridEl.addEventListener('contextmenu', onContextMenu);
+    return () => gridEl.removeEventListener('contextmenu', onContextMenu);
+  }, [boxRef]);
+
+  const ctxMenuRef = useRef(null);
+
+  useEffect(() => {
+    if (!ctxMenu) {
+      return undefined;
+    }
+    const onDown = (e) => {
+      if (ctxMenuRef.current && ctxMenuRef.current.contains(e.target)) {
+        return;
+      }
+      setCtxMenu(null);
+    };
+    const onKey = (e) => {
+      if (e.key === 'Escape') {
+        setCtxMenu(null);
+      }
+    };
+    window.addEventListener('mousedown', onDown);
+    window.addEventListener('scroll', onDown, true);
+    window.addEventListener('keydown', onKey);
+    return () => {
+      window.removeEventListener('mousedown', onDown);
+      window.removeEventListener('scroll', onDown, true);
+      window.removeEventListener('keydown', onKey);
+    };
+  }, [ctxMenu]);
+
   // Context value: rebuilt whenever the sheet content or a recalculation changes.
   const contextValue = useMemo(
     () => ({ engine, sheet, settings, activeCell, registerFormulaEditor, unregisterFormulaEditor }),
@@ -910,6 +996,39 @@ export default function Grid({
           settings={settings}
           onPick={onActiveCell}
         />
+      )}
+      {ctxMenu && (
+        <div
+          ref={ctxMenuRef}
+          className="xl-ctx-menu"
+          style={{ left: ctxMenu.x, top: ctxMenu.y }}
+        >
+          {ctxMenu.kind === 'row' ? (
+            <button
+              type="button"
+              className="xl-ctx-menu-item"
+              disabled={sheet.rows <= 1}
+              onClick={() => {
+                onDeleteRow(ctxMenu.index);
+                setCtxMenu(null);
+              }}
+            >
+              Delete row {ctxMenu.index + 1}
+            </button>
+          ) : (
+            <button
+              type="button"
+              className="xl-ctx-menu-item"
+              disabled={sheet.cols <= 1}
+              onClick={() => {
+                onDeleteColumn(ctxMenu.index);
+                setCtxMenu(null);
+              }}
+            >
+              Delete column {colToLetters(ctxMenu.index)}
+            </button>
+          )}
+        </div>
       )}
     </div>
   );

@@ -15,6 +15,8 @@ import {
   addCols,
   addRows,
   addSheet as addSheetToDoc,
+  deleteCol,
+  deleteRow,
   findMerge,
   mergeCells,
   normaliseDocument,
@@ -308,6 +310,40 @@ export default function WorkbookPage() {
     setDirty(true);
   }, [selectionRect, safeSheetIndex]);
 
+  // These mutate the live formula engine (so formula references get rewritten
+  // correctly), which is a side effect that must run exactly once. That rules
+  // out the setDoc(prev => ...) updater form: React (Strict Mode in
+  // development, and potentially concurrent rendering) may invoke an updater
+  // function more than once per call. Compute the next document from the doc
+  // already in scope instead, and hand setDoc a plain value.
+  const handleDeleteRow = useCallback(
+    (rowIndex) => {
+      if (!engine || !doc) {
+        return;
+      }
+      setDoc(deleteRow(doc, safeSheetIndex, rowIndex, engine));
+      setActiveCell(null);
+      setSelection([]);
+      setCalcTick((t) => t + 1);
+      setDirty(true);
+    },
+    [doc, engine, safeSheetIndex],
+  );
+
+  const handleDeleteColumn = useCallback(
+    (colIndex) => {
+      if (!engine || !doc) {
+        return;
+      }
+      setDoc(deleteCol(doc, safeSheetIndex, colIndex, engine));
+      setActiveCell(null);
+      setSelection([]);
+      setCalcTick((t) => t + 1);
+      setDirty(true);
+    },
+    [doc, engine, safeSheetIndex],
+  );
+
   const handleFreeze = useCallback(
     (patch) => {
       setDoc((prev) => setFreeze(prev, safeSheetIndex, patch));
@@ -488,6 +524,8 @@ export default function WorkbookPage() {
         onSelection={setSelection}
         onColWidth={handleColWidth}
         onRowHeight={handleRowHeight}
+        onDeleteRow={handleDeleteRow}
+        onDeleteColumn={handleDeleteColumn}
       />
 
       <SheetTabs

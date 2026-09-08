@@ -25,7 +25,7 @@
  */
 
 import { DEFAULT_SETTINGS } from './formats.js';
-import { toA1 } from './cellAddress.js';
+import { colToLetters, fromA1, lettersToCol, toA1 } from './cellAddress.js';
 
 let sheetSeq = 1;
 
@@ -368,6 +368,196 @@ export function addRows(doc, sheetIdx, count) {
 export function addCols(doc, sheetIdx, count) {
   const d = clone(doc);
   d.sheets[sheetIdx].cols += count;
+  return d;
+}
+
+/**
+ * Shift merges to account for a row or column having been removed at `index`.
+ * Merges entirely inside the removed line lose one span; a merge whose
+ * anchor is after the removed line moves back by one; a merge that would
+ * collapse to nothing is dropped.
+ *
+ * @param {Array<[number, number, number, number]>} merges
+ * @param {'row'|'col'} axis
+ * @param {number} index
+ * @returns {Array<[number, number, number, number]>}
+ */
+function shiftMergesAfterRemoval(merges, axis, index) {
+  const pos = axis === 'row' ? 0 : 1;
+  const span = axis === 'row' ? 2 : 3;
+  const out = [];
+  (merges || []).forEach((m) => {
+    const next = [...m];
+    const start = next[pos];
+    const end = start + next[span];
+    if (index < start) {
+      next[pos] -= 1;
+    } else if (index < end) {
+      next[span] -= 1;
+    }
+    if (next[span] > 0 && next[axis === 'row' ? 3 : 2] > 0) {
+      out.push(next);
+    }
+  });
+  return out;
+}
+
+/**
+ * Re-read every cell's raw entry from the formula engine. Used after a
+ * structural edit (row / column removal) that was first applied to the
+ * engine via HyperFormula's own removeRows / removeColumns, so that
+ * formulas anywhere in the workbook - including on other sheets - keep
+ * whatever reference rewriting HyperFormula did, instead of going stale or
+ * turning into a self reference.
+ *
+ * @param {Object} doc
+ * @param {import('./formulaEngine.js').Engine} engine
+ */
+function refreshRawFromEngine(doc, engine) {
+  doc.sheets.forEach((s) => {
+    const sheetId = engine.sheetId(s.name);
+    if (sheetId === undefined) {
+      return;
+    }
+    Object.keys(s.cells).forEach((a1) => {
+      const pos = fromA1(a1);
+      if (!pos) {
+        return;
+      }
+      const serialized = engine.hf.getCellSerialized({ sheet: sheetId, row: pos.row, col: pos.col });
+      const cell = s.cells[a1];
+      if (serialized === null || serialized === undefined || serialized === '') {
+        delete cell.v;
+        delete cell.fmt;
+        delete cell.decimals;
+        if (!cell.style || Object.keys(cell.style).length === 0) {
+          delete s.cells[a1];
+        }
+      } else {
+        cell.v = String(serialized);
+      }
+    });
+  });
+}
+
+/**
+ * Remove a row from a sheet, shifting cells, styles, heights and merges up
+ * to fill the gap. Applies the removal to the live formula engine first so
+ * formula references (on this sheet and any other) are kept correct rather
+ * than shifted blindly. A no-op if the sheet has only one row.
+ *
+ * @param {Object} doc
+ * @param {number} sheetIdx
+ * @param {number} rowIndex Zero based.
+ * @param {import('./formulaEngine.js').Engine} engine
+ * @returns {Object}
+ */
+export function deleteRow(doc, sheetIdx, rowIndex, engine) {
+  const sheet = doc.sheets[sheetIdx];
+  if (!sheet || sheet.rows <= 1 || rowIndex < 0 || rowIndex >= sheet.rows) {
+    return doc;
+  }
+  const sheetId = engine.sheetId(sheet.name);
+  engine.hf.removeRows(sheetId, [rowIndex, 1]);
+
+  const d = clone(doc);
+  const s = d.sheets[sheetIdx];
+
+  const cells = {};
+  Object.entries(s.cells).forEach(([a1, cell]) => {
+    const pos = fromA1(a1);
+    if (!pos || pos.row === rowIndex) {
+      return;
+    }
+    const row = pos.row > rowIndex ? pos.row - 1 : pos.row;
+    cells[toA1(row, pos.col)] = cell;
+  });
+  s.cells = cells;
+
+  const rowStyles = {};
+  Object.entries(s.rowStyles).forEach(([key, style]) => {
+    const r = Number(key);
+    if (r === rowIndex) {
+      return;
+    }
+    rowStyles[String(r > rowIndex ? r - 1 : r)] = style;
+  });
+  s.rowStyles = rowStyles;
+
+  const rowHeights = {};
+  Object.entries(s.rowHeights).forEach(([key, height]) => {
+    const r = Number(key);
+    if (r === rowIndex) {
+      return;
+    }
+    rowHeights[String(r > rowIndex ? r - 1 : r)] = height;
+  });
+  s.rowHeights = rowHeights;
+
+  s.merges = shiftMergesAfterRemoval(s.merges, 'row', rowIndex);
+  s.rows -= 1;
+  refreshRawFromEngine(d, engine);
+  return d;
+}
+
+/**
+ * Remove a column from a sheet, shifting cells, styles, widths and merges
+ * left to fill the gap. Applies the removal to the live formula engine
+ * first so formula references (on this sheet and any other) are kept
+ * correct rather than shifted blindly. A no-op if the sheet has only one
+ * column.
+ *
+ * @param {Object} doc
+ * @param {number} sheetIdx
+ * @param {number} colIndex Zero based.
+ * @param {import('./formulaEngine.js').Engine} engine
+ * @returns {Object}
+ */
+export function deleteCol(doc, sheetIdx, colIndex, engine) {
+  const sheet = doc.sheets[sheetIdx];
+  if (!sheet || sheet.cols <= 1 || colIndex < 0 || colIndex >= sheet.cols) {
+    return doc;
+  }
+  const sheetId = engine.sheetId(sheet.name);
+  engine.hf.removeColumns(sheetId, [colIndex, 1]);
+
+  const d = clone(doc);
+  const s = d.sheets[sheetIdx];
+
+  const cells = {};
+  Object.entries(s.cells).forEach(([a1, cell]) => {
+    const pos = fromA1(a1);
+    if (!pos || pos.col === colIndex) {
+      return;
+    }
+    const col = pos.col > colIndex ? pos.col - 1 : pos.col;
+    cells[toA1(pos.row, col)] = cell;
+  });
+  s.cells = cells;
+
+  const colStyles = {};
+  Object.entries(s.colStyles).forEach(([letter, style]) => {
+    const c = lettersToCol(letter);
+    if (c === colIndex) {
+      return;
+    }
+    colStyles[colToLetters(c > colIndex ? c - 1 : c)] = style;
+  });
+  s.colStyles = colStyles;
+
+  const colWidths = {};
+  Object.entries(s.colWidths).forEach(([letter, width]) => {
+    const c = lettersToCol(letter);
+    if (c === colIndex) {
+      return;
+    }
+    colWidths[colToLetters(c > colIndex ? c - 1 : c)] = width;
+  });
+  s.colWidths = colWidths;
+
+  s.merges = shiftMergesAfterRemoval(s.merges, 'col', colIndex);
+  s.cols -= 1;
+  refreshRawFromEngine(d, engine);
   return d;
 }
 

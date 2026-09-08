@@ -931,6 +931,40 @@ table.data tbody tr:hover {
   outline: none;
 }
 
+.xl-ctx-menu {
+  position: fixed;
+  z-index: 80;
+  min-width: 160px;
+  padding: 4px;
+  background: var(--c-surface);
+  border: 1px solid var(--c-border-strong);
+  border-radius: 6px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+}
+
+.xl-ctx-menu-item {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 6px 10px;
+  border: none;
+  border-radius: 4px;
+  background: none;
+  color: var(--c-text);
+  font-family: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.xl-ctx-menu-item:hover:not(:disabled) {
+  background: var(--c-primary-soft);
+}
+
+.xl-ctx-menu-item:disabled {
+  color: var(--c-text-soft);
+  cursor: default;
+}
+
 /* sheet tabs */
 
 .sheet-tabs {
@@ -1154,74 +1188,4 @@ table.data tbody tr:hover {
 
 .dsg-cell {
   font-family: var(--font-ui);
-}
-
-/* ---------- CM floating branding banner ---------------------------- */
-
-.cm-float-ad {
-  position: fixed;
-  right: 14px;
-  bottom: 14px;
-  z-index: 25;
-  background: var(--cm-bg, #f8fafc);
-  color: var(--cm-color, #334155);
-  border: 1px solid var(--c-border);
-  border-radius: 999px;
-  box-shadow: var(--shadow);
-  padding: 6px 10px;
-  max-width: 108px;
-  overflow: hidden;
-  font-size: 11px;
-  line-height: 1.4;
-  transition: max-width 0.35s ease, border-radius 0.35s ease;
-}
-
-.cm-float-ad--hovered {
-  max-width: min(530px, calc(100vw - 28px));
-  border-radius: 12px;
-}
-
-.cm-float-ad__content {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  white-space: nowrap;
-}
-
-.cm-float-ad--hovered .cm-float-ad__content {
-  align-items: flex-start;
-  white-space: normal;
-}
-
-.cm-float-ad__content--column {
-  flex-direction: column;
-  align-items: flex-start;
-  white-space: normal;
-}
-
-.cm-float-ad__logo {
-  display: block;
-  flex-shrink: 0;
-}
-
-.cm-float-ad__link {
-  color: inherit;
-  font-weight: bold;
-}
-
-.cm-float-ad__mobile-detail {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  margin-top: 4px;
-}
-
-.cm-float-ad--mobile {
-  max-width: 158px;
-}
-
-.cm-float-ad--mobile-expanded {
-  max-width: calc(100vw - 24px);
-  border-radius: 12px;
-  white-space: normal;
 }
